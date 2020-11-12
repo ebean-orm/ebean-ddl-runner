@@ -1,10 +1,7 @@
 package io.ebean.ddlrunner;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Reader;
@@ -14,8 +11,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DdlParserTest {
-
-  private static final Logger log = LoggerFactory.getLogger(DdlParserTest.class);
 
   @Test
   public void parse_functionWithInlineComments() {
@@ -39,7 +34,6 @@ public class DdlParserTest {
   @Test
   public void parse_sqlserver_create_procs() throws FileNotFoundException {
 
-    log.warn("working dir {}", new File(".").getAbsoluteFile());
     FileReader fr = new FileReader("src/test/resources/dbmig_sqlserver/I__create_procs.sql");
     final List<String> statements = parse(fr);
 
@@ -66,7 +60,6 @@ public class DdlParserTest {
   @Test
   public void parse_postgres_procs() throws FileNotFoundException {
 
-    log.warn("working dir {}", new File(".").getAbsoluteFile());
     FileReader fr = new FileReader("src/test/resources/dbmig_postgres/ex1.sql");
     final List<String> statements = parse(fr);
 
@@ -91,7 +84,6 @@ public class DdlParserTest {
   @Test
   public void parse_postgres_createAll() throws FileNotFoundException {
 
-    log.warn("working dir {}", new File(".").getAbsoluteFile());
     FileReader fr = new FileReader("src/test/resources/dbmig_postgres/pg-create-all.sql");
     final List<String> statements = parse(fr);
 
