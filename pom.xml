@@ -13,6 +13,14 @@
   <artifactId>ebean-ddl-runner</artifactId>
   <version>1.0-SNAPSHOT</version>
 
+  <name>ebean ddl runner</name>
+  <url>https://ebean.io/</url>
+
+  <scm>
+    <developerConnection>scm:git:git@github.com:ebean-orm/ebean-ddl-runner.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
   <dependencies>
 
     <dependency>
