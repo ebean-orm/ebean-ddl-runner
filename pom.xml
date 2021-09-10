@@ -9,14 +9,14 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-ddl-runner</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
 
   <name>ebean ddl runner</name>
   <url>https://ebean.io/</url>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean-ddl-runner.git</developerConnection>
-    <tag>ebean-ddl-runner-1.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <properties>
