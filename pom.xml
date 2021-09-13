@@ -19,9 +19,9 @@
     <tag>HEAD</tag>
   </scm>
 
-  <properties>
-    <java.version>11</java.version>
-  </properties>
+<!--  <properties>-->
+<!--    <java.version>11</java.version>-->
+<!--  </properties>-->
 
   <dependencies>
 
