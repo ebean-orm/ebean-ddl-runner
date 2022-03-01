@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,24 +61,15 @@ public class DdlRunner {
    * Execute all the statements in a single transaction.
    */
   private void runStatements(List<String> statements, Connection connection) throws SQLException {
-    List<String> noDuplicates = new ArrayList<>();
-    for (String statement : statements) {
-      if (!noDuplicates.contains(statement)) {
-        noDuplicates.add(statement);
-      }
-    }
-    if (noDuplicates.isEmpty()) {
-      return;
-    }
     boolean setAutoCommit = useAutoCommit && !connection.getAutoCommit();
     if (setAutoCommit) {
       connection.setAutoCommit(true);
     }
     try {
-      logger.info("Executing {} - {} statements, autoCommit:{}", scriptName, noDuplicates.size(), useAutoCommit);
-      for (int i = 0; i < noDuplicates.size(); i++) {
-        String xOfy = (i + 1) + " of " + noDuplicates.size();
-        String ddl = noDuplicates.get(i);
+      logger.info("Executing {} - {} statements, autoCommit:{}", scriptName, statements.size(), useAutoCommit);
+      for (int i = 0; i < statements.size(); i++) {
+        String xOfy = (i + 1) + " of " + statements.size();
+        String ddl = statements.get(i);
         runStatement(xOfy, ddl, connection);
       }
     } finally {
