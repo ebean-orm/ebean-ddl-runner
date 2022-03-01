@@ -10,11 +10,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DdlParserTest {
+class DdlParserTest {
 
   @Test
-  public void parse_functionWithInlineComments() {
-
+  void parse_functionWithInlineComments() {
     String plpgsql = "create or replace function _partition_meta_initdateoverride(\n" +
       "  meta         partition_meta,    -- the meta data to modify\n" +
       "  initdate     date)              -- the initdate to override the period_start\n" +
@@ -32,8 +31,7 @@ public class DdlParserTest {
   }
 
   @Test
-  public void parse_sqlserver_create_procs() throws FileNotFoundException {
-
+  void parse_sqlserver_create_procs() throws FileNotFoundException {
     FileReader fr = new FileReader("src/test/resources/dbmig_sqlserver/I__create_procs.sql");
     final List<String> statements = parse(fr);
 
@@ -58,8 +56,7 @@ public class DdlParserTest {
 
 
   @Test
-  public void parse_postgres_procs() throws FileNotFoundException {
-
+  void parse_postgres_procs() throws FileNotFoundException {
     FileReader fr = new FileReader("src/test/resources/dbmig_postgres/ex1.sql");
     final List<String> statements = parse(fr);
 
@@ -82,8 +79,7 @@ public class DdlParserTest {
 
 
   @Test
-  public void parse_postgres_createAll() throws FileNotFoundException {
-
+  void parse_postgres_createAll() throws FileNotFoundException {
     FileReader fr = new FileReader("src/test/resources/dbmig_postgres/pg-create-all.sql");
     final List<String> statements = parse(fr);
 
@@ -91,116 +87,100 @@ public class DdlParserTest {
   }
 
   @Test
-  public void parse_mysql_createAll() throws FileNotFoundException {
-
+  void parse_mysql_createAll() throws FileNotFoundException {
     FileReader fr = new FileReader("src/test/resources/dbmig_mysql/mysql-create-all.sql");
     final List<String> statements = parse(fr);
     assertThat(statements).hasSize(1010);
   }
 
   @Test
-  public void parse_mysql_dropAll() throws FileNotFoundException {
-
+  void parse_mysql_dropAll() throws FileNotFoundException {
     FileReader fr = new FileReader("src/test/resources/dbmig_mysql/mysql-drop-all.sql");
     final List<String> statements = parse(fr);
     assertThat(statements).hasSize(997);
   }
 
   @Test
-  public void parse_ignoresEmptyLines() {
-
+  void parse_ignoresEmptyLines() {
     List<String> stmts = parse("\n\none;\n\ntwo;\n\n");
     assertThat(stmts).containsExactly("one;", "two;");
   }
 
   @Test
-  public void parse_ignoresComments_whenFirst() {
-
+  void parse_ignoresComments_whenFirst() {
     List<String> stmts = parse("-- comment\ntwo;");
     assertThat(stmts).containsExactly("two;");
   }
 
   @Test
-  public void parse_ignoresEmptyLines_whenFirst() {
-
+  void parse_ignoresEmptyLines_whenFirst() {
     List<String> stmts = parse("\n\n-- comment\ntwo;\n\n");
     assertThat(stmts).containsExactly("two;");
   }
 
   @Test
-  public void parse_inlineEmptyLines_replacedWithSpace() {
-
+  void parse_inlineEmptyLines_replacedWithSpace() {
     List<String> stmts = parse("\n\n-- comment\none\ntwo;\n\n");
     assertThat(stmts).containsExactly("one\ntwo;");
   }
 
 
   @Test
-  public void parse_ignoresComments() {
-
+  void parse_ignoresComments() {
     List<String> stmts = parse("one;\n-- comment\ntwo;");
     assertThat(stmts).containsExactly("one;", "two;");
   }
 
   @Test
-  public void parse_ignoresEndOfLineComments() {
-
+  void parse_ignoresEndOfLineComments() {
     List<String> stmts = parse("one; -- comment\ntwo;");
     assertThat(stmts).containsExactly("one;", "two;");
   }
 
   @Test
-  public void parse_semiInContent_noLinefeedInContent() {
-
+  void parse_semiInContent_noLinefeedInContent() {
     List<String> stmts = parse("insert ('one;x');");
     assertThat(stmts).containsExactly("insert ('one;x');");
   }
 
   @Test
-  public void parse_semiNewLineInContent_withLinefeedInContent2() {
-
+  void parse_semiNewLineInContent_withLinefeedInContent2() {
     List<String> stmts = parse("insert ('on;e\n');");
     assertThat(stmts).containsExactly("insert ('on;e\n');");
   }
 
   @Test
-  public void parse_semiNewLineInContent_withLinefeedInContent3() {
-
+  void parse_semiNewLineInContent_withLinefeedInContent3() {
     List<String> stmts = parse("insert ('one;\n');");
     assertThat(stmts).containsExactly("insert ('one;\n');");
   }
 
   @Test
-  public void parse_semiInContent() {
-
+  void parse_semiInContent() {
     List<String> stmts = parse("';jim';\ntwo;");
     assertThat(stmts).containsExactly("';jim';", "two;");
   }
 
   @Test
-  public void parse_semiInContent_withTailingComments() {
-
+  void parse_semiInContent_withTailingComments() {
     List<String> stmts = parse("insert (';one'); -- aaa\ninsert (';two'); -- bbb");
     assertThat(stmts).containsExactly("insert (';one');", "insert (';two');");
   }
 
   @Test
-  public void parse_semiInContent_withLinefeedInContent() {
-
+  void parse_semiInContent_withLinefeedInContent() {
     List<String> stmts = parse("insert ('one;\n');");
     assertThat(stmts).containsExactly("insert ('one;\n');");
   }
 
   @Test
-  public void parse_noTailingSemi() {
-
+  void parse_noTailingSemi() {
     List<String> stmts = parse("one");
     assertThat(stmts).containsExactly("one");
   }
 
   @Test
-  public void parse_noTailingSemi_multiLine() {
-
+  void parse_noTailingSemi_multiLine() {
     List<String> stmts = parse("one\ntwo");
     assertThat(stmts).containsExactly("one\ntwo");
   }

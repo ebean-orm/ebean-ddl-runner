@@ -7,11 +7,10 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ScriptTransformTest {
+class ScriptTransformTest {
 
   @Test
-  public void transform() {
-
+  void transform() {
     Map<String, String> map = new HashMap<>();
     map.put("one", "PLACE1");
     map.put("two", "PLACE2");
