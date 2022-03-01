@@ -8,21 +8,15 @@ class DdlAutoCommitTest {
 
   @Test
   void testForPlatform_postgres() {
-    assertThat(DdlAutoCommit.forPlatform("postgres")).isInstanceOf(PostgresAutoCommit.class);
-    assertThat(DdlAutoCommit.forPlatform("POSTGRES")).isInstanceOf(PostgresAutoCommit.class);
-    assertThat(DdlAutoCommit.forPlatform("Postgres")).isInstanceOf(PostgresAutoCommit.class);
-  }
-
-  @Test
-  void testForPlatform_cockroach() {
-    assertThat(DdlAutoCommit.forPlatform("cockroach")).isInstanceOf(CockroachAutoCommit.class);
-    assertThat(DdlAutoCommit.forPlatform("COCKROACH")).isInstanceOf(CockroachAutoCommit.class);
+    assertThat(DdlDetect.forPlatform("postgres")).isInstanceOf(DdlDetectPostgres.class);
+    assertThat(DdlDetect.forPlatform("POSTGRES")).isInstanceOf(DdlDetectPostgres.class);
+    assertThat(DdlDetect.forPlatform("Postgres")).isInstanceOf(DdlDetectPostgres.class);
   }
 
   @Test
   void testForPlatform_others() {
-    assertThat(DdlAutoCommit.forPlatform("other")).isInstanceOf(NoAutoCommit.class);
-    assertThat(DdlAutoCommit.forPlatform("mysql")).isInstanceOf(NoAutoCommit.class);
-    assertThat(DdlAutoCommit.forPlatform("oracle")).isInstanceOf(NoAutoCommit.class);
+    assertThat(DdlDetect.forPlatform("other")).isInstanceOf(DdlDetectNone.class);
+    assertThat(DdlDetect.forPlatform("mysql")).isInstanceOf(DdlDetectNone.class);
+    assertThat(DdlDetect.forPlatform("oracle")).isInstanceOf(DdlDetectNone.class);
   }
 }

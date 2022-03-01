@@ -27,23 +27,23 @@ public class DdlRunner {
    * auto commit is used (in which case errors are allowed).
    */
   public DdlRunner(boolean useAutoCommit, String scriptName) {
-    this(useAutoCommit, scriptName, DdlAutoCommit.NONE);
+    this(useAutoCommit, scriptName, DdlDetect.NONE);
   }
 
   /**
    * Create specifying the database platform by name.
    */
   public DdlRunner(boolean useAutoCommit, String scriptName, String platformName) {
-    this(useAutoCommit, scriptName, DdlAutoCommit.forPlatform(platformName));
+    this(useAutoCommit, scriptName, DdlDetect.forPlatform(platformName));
   }
 
   /**
    * Create specifying the auto commit behaviour (for the database platform).
    */
-  public DdlRunner(boolean useAutoCommit, String scriptName, DdlAutoCommit ddlAutoCommit) {
-    this.useAutoCommit = useAutoCommit || ddlAutoCommit.isAutoCommit();
+  public DdlRunner(boolean useAutoCommit, String scriptName, DdlDetect ddlAutoCommit) {
+    this.useAutoCommit = useAutoCommit;
     this.scriptName = scriptName;
-    this.parser = new DdlParser(this.useAutoCommit ? DdlAutoCommit.NONE : ddlAutoCommit);
+    this.parser = new DdlParser(this.useAutoCommit ? DdlDetect.NONE : ddlAutoCommit);
   }
 
   /**

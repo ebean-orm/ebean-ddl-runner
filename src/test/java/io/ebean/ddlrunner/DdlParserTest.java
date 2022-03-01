@@ -190,7 +190,7 @@ class DdlParserTest {
   }
 
   private List<String> parse(Reader reader) {
-    return new DdlParser(DdlAutoCommit.NONE).parse(reader);
+    return new DdlParser(DdlDetect.NONE).parse(reader);
   }
 
 }

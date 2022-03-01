@@ -11,19 +11,17 @@ import java.util.List;
  */
 public class DdlParser {
 
-  private final DdlAutoCommit ddlAutoCommit;
-
+  private final DdlDetect ddlDetect;
   private final StatementsSeparator parse = new StatementsSeparator();
-
   private final List<String> statements = new ArrayList<>();
   private final List<String> statementsNonTrans = new ArrayList<>();
 
-  public DdlParser(DdlAutoCommit ddlAutoCommit) {
-    this.ddlAutoCommit = ddlAutoCommit;
+  public DdlParser(DdlDetect ddlDetect) {
+    this.ddlDetect = ddlDetect;
   }
 
   void push(String sql) {
-    if (ddlAutoCommit.transactional(sql)) {
+    if (ddlDetect.transactional(sql)) {
       statements.add(sql);
     } else {
       statementsNonTrans.add(sql);
