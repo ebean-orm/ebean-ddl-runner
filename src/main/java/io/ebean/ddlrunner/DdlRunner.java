@@ -1,5 +1,7 @@
 package io.ebean.ddlrunner;
 
+import io.avaje.applog.AppLog;
+
 import java.io.StringReader;
 import java.lang.System.Logger.Level;
 import java.sql.Connection;
@@ -12,7 +14,7 @@ import java.util.List;
  */
 public class DdlRunner {
 
-  protected static final System.Logger logger = System.getLogger("io.ebean.DDL");
+  protected static final System.Logger logger = AppLog.getLogger("io.ebean.DDL");
 
   private final DdlParser parser;
 
