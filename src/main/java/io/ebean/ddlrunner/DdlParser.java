@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Parses string content into separate SQL/DDL statements.
  */
-public class DdlParser {
+public final class DdlParser {
 
   private final DdlDetect ddlDetect;
   private final StatementsSeparator parse = new StatementsSeparator();
@@ -18,14 +18,6 @@ public class DdlParser {
 
   public DdlParser(DdlDetect ddlDetect) {
     this.ddlDetect = ddlDetect;
-  }
-
-  void push(String sql) {
-    if (ddlDetect.transactional(sql)) {
-      statements.add(sql);
-    } else {
-      statementsNonTrans.add(sql);
-    }
   }
 
   /**
@@ -52,6 +44,14 @@ public class DdlParser {
     return statementsNonTrans;
   }
 
+  private void push(String sql) {
+    if (ddlDetect.transactional(sql)) {
+      statements.add(sql);
+    } else {
+      statementsNonTrans.add(sql);
+    }
+  }
+
   /**
    * Local utility used to detect the end of statements / separate statements.
    * This is often just the semicolon character but for trigger/procedures this
@@ -61,19 +61,16 @@ public class DdlParser {
   class StatementsSeparator {
 
     private static final String EOL = "\n";
-
     private static final String GO = "GO";
     private static final String PROCEDURE = " PROCEDURE ";
 
     private boolean trimDelimiter;
     private boolean inDbProcedure;
-
     private StringBuilder sb = new StringBuilder();
-
     private int lineCount;
     private int quoteCount;
 
-    void lineContainsDollars(String line) {
+    private void lineContainsDollars(String line) {
       if (inDbProcedure) {
         if (trimDelimiter) {
           line = line.replace("$$", "");
@@ -89,7 +86,7 @@ public class DdlParser {
       }
     }
 
-    void endOfStatement(String line) {
+    private void endOfStatement(String line) {
       // end of Db procedure
       sb.append(line);
       push(sb.toString().trim());
@@ -106,32 +103,26 @@ public class DdlParser {
     /**
      * Process the next line of the script.
      */
-    void nextLine(String line) {
-
+    private void nextLine(String line) {
       if (line.trim().equals(GO)) {
         endOfStatement("");
         return;
       }
-
       if (line.contains("$$")) {
         lineContainsDollars(line);
         return;
       }
-
       if (inDbProcedure) {
         sb.append(line).append(EOL);
         return;
       }
-
       if (sb.length() == 0 && (line.isEmpty() || line.startsWith("--"))) {
         // ignore leading empty lines and sql comments
         return;
       }
-
       if (lineCount == 0 && isStartDbProcedure(line)) {
         inDbProcedure = true;
       }
-
       lineCount++;
       quoteCount += countQuotes(line);
       if (hasOddQuotes()) {
@@ -143,11 +134,9 @@ public class DdlParser {
       int semiPos = line.lastIndexOf(';');
       if (semiPos == -1) {
         sb.append(line).append(EOL);
-
       } else if (semiPos == line.length() - 1) {
         // semicolon at end of line
         endOfStatement(line);
-
       } else {
         // semicolon in middle of line
         String remaining = line.substring(semiPos + 1).trim();
@@ -156,7 +145,6 @@ public class DdlParser {
           sb.append(line).append(EOL);
           return;
         }
-
         String preSemi = line.substring(0, semiPos + 1);
         endOfStatement(preSemi);
       }
@@ -192,7 +180,7 @@ public class DdlParser {
     /**
      * Append trailing non-terminated content as an extra statement.
      */
-    void endOfContent() {
+    private void endOfContent() {
       String remaining = sb.toString().trim();
       if (remaining.length() > 0) {
         push(remaining);

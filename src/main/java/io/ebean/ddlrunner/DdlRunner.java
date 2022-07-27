@@ -12,14 +12,12 @@ import java.util.List;
 /**
  * Runs DDL scripts.
  */
-public class DdlRunner {
+public final class DdlRunner {
 
-  protected static final System.Logger logger = AppLog.getLogger("io.ebean.DDL");
+  static final System.Logger logger = AppLog.getLogger("io.ebean.DDL");
 
   private final DdlParser parser;
-
   private final String scriptName;
-
   private final boolean useAutoCommit;
 
   /**
@@ -67,9 +65,9 @@ public class DdlRunner {
     }
     try {
       logger.log(Level.INFO, "Executing {0} - {1} statements, autoCommit:{2}", scriptName, statements.size(), useAutoCommit);
-      for (int i = 0; i < statements.size(); i++) {
-        String xOfy = (i + 1) + " of " + statements.size();
-        String ddl = statements.get(i);
+      for (int x = 0, y = statements.size(); x < y; x++) {
+        String xOfy = (x + 1) + " of " + y;
+        String ddl = statements.get(x);
         runStatement(xOfy, ddl, connection);
       }
     } finally {
@@ -95,21 +93,21 @@ public class DdlRunner {
       return;
     }
     if (logger.isLoggable(Level.DEBUG)) {
-      logger.log(Level.DEBUG, "executing {0} {1}", oneOf, getSummary(stmt));
+      logger.log(Level.DEBUG, "executing {0} {1}", oneOf, summary(stmt));
     }
 
     try (PreparedStatement statement = c.prepareStatement(stmt)) {
       statement.execute();
     } catch (SQLException e) {
       if (useAutoCommit) {
-        logger.log(Level.DEBUG, " ... ignoring error executing {0} error: {1}", getSummary(stmt), e.getMessage());
+        logger.log(Level.DEBUG, " ... ignoring error executing {0} error: {1}", summary(stmt), e.getMessage());
       } else {
         throw new SQLException("Error executing stmt[" + stmt + "] error[" + e.getMessage() + "]", e);
       }
     }
   }
 
-  private String getSummary(String s) {
+  private String summary(String s) {
     if (s.length() > 80) {
       return s.substring(0, 80).trim().replace('\n', ' ') + "...";
     }
@@ -129,22 +127,22 @@ public class DdlRunner {
    */
   public int runNonTransactional(Connection connection, List<String> nonTransactional) {
     int count = 0;
-    String sql = null;
     try {
       logger.log(Level.DEBUG, "running {0} non-transactional migration statements", nonTransactional.size());
       connection.setAutoCommit(true);
-      for (int i = 0; i < nonTransactional.size(); i++) {
-        sql = nonTransactional.get(i);
+      for (String sql : nonTransactional) {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
           logger.log(Level.DEBUG, "executing - {0}", sql);
           statement.execute();
           count++;
+        } catch (SQLException e) {
+          logger.log(Level.ERROR, "Error running non-transaction migration: " + sql, e);
+          return count;
         }
       }
       return count;
-
     } catch (SQLException e) {
-      logger.log(Level.ERROR, "Error running non-transaction migration: " + sql, e);
+      logger.log(Level.ERROR, "Error trying to run non-transaction migrations", e);
       return count;
     } finally {
       try {

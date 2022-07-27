@@ -18,7 +18,7 @@ public interface DdlDetect {
   }
 
   /**
-   * Return false if the SQL is non transactional and should run with auto commit.
+   * Return false if the SQL is non-transactional and should run with auto commit.
    */
   boolean transactional(String sql);
 

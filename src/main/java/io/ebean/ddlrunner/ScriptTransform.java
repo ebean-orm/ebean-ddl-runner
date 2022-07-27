@@ -6,7 +6,15 @@ import java.util.Map;
 /**
  * Transforms a SQL script given a map of key/value substitutions.
  */
-public class ScriptTransform {
+public final class ScriptTransform {
+
+  private final Map<String, String> placeholders = new HashMap<>();
+
+  ScriptTransform(Map<String, String> map) {
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      placeholders.put(wrapKey(entry.getKey()), entry.getValue());
+    }
+  }
 
   /**
    * Transform just ${table} with the table name.
@@ -15,24 +23,15 @@ public class ScriptTransform {
     return script.replace(key, value);
   }
 
-  private final Map<String,String> placeholders = new HashMap<>();
-
-  ScriptTransform(Map<String,String> map) {
-    for (Map.Entry<String, String> entry : map.entrySet()) {
-      placeholders.put(wrapKey(entry.getKey()), entry.getValue());
-    }
-  }
-
   /**
    * Build and return a ScriptTransform that replaces placeholder values in DDL scripts.
    */
   public static ScriptTransform build(String runPlaceholders, Map<String, String> runPlaceholderMap) {
-    Map<String, String> map = PlaceholderBuilder.build(runPlaceholders, runPlaceholderMap);
-    return new ScriptTransform(map);
+    return new ScriptTransform(PlaceholderBuilder.build(runPlaceholders, runPlaceholderMap));
   }
 
   private String wrapKey(String key) {
-    return "${"+key+"}";
+    return "${" + key + "}";
   }
 
   /**

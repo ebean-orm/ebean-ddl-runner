@@ -6,14 +6,14 @@ import java.util.Map;
 /**
  * Joins placeholder map and comma/equals delimited string.
  */
-class PlaceholderBuilder {
+final class PlaceholderBuilder {
 
-  private final Map<String,String> map = new HashMap<>();
+  private final Map<String, String> map = new HashMap<>();
 
   /**
    * Create with raw comma and equals delimited pairs plus map of key value pairs.
    */
-  static Map<String,String> build(String commaDelimited, Map<String,String> placeholders) {
+  static Map<String, String> build(String commaDelimited, Map<String, String> placeholders) {
     PlaceholderBuilder builder = new PlaceholderBuilder();
     builder.add(commaDelimited);
     builder.add(placeholders);
@@ -41,7 +41,7 @@ class PlaceholderBuilder {
   /**
    * Add a map of key value placeholder pairs.
    */
-  private void add(Map<String,String> placeholders) {
+  private void add(Map<String, String> placeholders) {
     if (placeholders != null) {
       map.putAll(placeholders);
     }
