@@ -40,7 +40,7 @@ public final class DdlParser {
   /**
    * Return the non-transactional statements which run later with auto commit true.
    */
-  public List<String> getNonTransactional() {
+  public List<String> nonTransactional() {
     return statementsNonTrans;
   }
 
