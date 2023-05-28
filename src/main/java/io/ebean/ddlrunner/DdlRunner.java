@@ -7,6 +7,7 @@ import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -52,7 +53,7 @@ public final class DdlRunner {
   public List<String> runAll(String content, Connection connection) throws SQLException {
     List<String> statements = parser.parse(new StringReader(content));
     runStatements(statements, connection);
-    return parser.getNonTransactional();
+    return parser.nonTransactional();
   }
 
   /**
@@ -80,29 +81,29 @@ public final class DdlRunner {
   /**
    * Execute the statement.
    */
-  private void runStatement(String oneOf, String stmt, Connection c) throws SQLException {
+  private void runStatement(String oneOf, String sql, Connection c) throws SQLException {
     // trim and remove trailing ; or /
-    stmt = stmt.trim();
-    if (stmt.endsWith(";")) {
-      stmt = stmt.substring(0, stmt.length() - 1);
-    } else if (stmt.endsWith("/")) {
-      stmt = stmt.substring(0, stmt.length() - 1);
+    sql = sql.trim();
+    if (sql.endsWith(";")) {
+      sql = sql.substring(0, sql.length() - 1);
+    } else if (sql.endsWith("/")) {
+      sql = sql.substring(0, sql.length() - 1);
     }
-    if (stmt.isEmpty()) {
+    if (sql.isEmpty()) {
       logger.log(Level.DEBUG, "skip empty statement at {0}", oneOf);
       return;
     }
     if (logger.isLoggable(Level.DEBUG)) {
-      logger.log(Level.DEBUG, "executing {0} {1}", oneOf, summary(stmt));
+      logger.log(Level.DEBUG, "executing {0} {1}", oneOf, summary(sql));
     }
 
-    try (PreparedStatement statement = c.prepareStatement(stmt)) {
-      statement.execute();
+    try (Statement statement = c.createStatement()) {
+      statement.execute(sql);
     } catch (SQLException e) {
       if (useAutoCommit) {
-        logger.log(Level.DEBUG, " ... ignoring error executing {0} error: {1}", summary(stmt), e.getMessage());
+        logger.log(Level.DEBUG, " ... ignoring error executing {0} error: {1}", summary(sql), e.getMessage());
       } else {
-        throw new SQLException("Error executing stmt[" + stmt + "] error[" + e.getMessage() + "]", e);
+        throw new SQLException("Error executing [" + sql + "] error[" + e.getMessage() + "]", e);
       }
     }
   }
@@ -118,7 +119,7 @@ public final class DdlRunner {
    * Run any non-transactional statements from the just parsed script.
    */
   public int runNonTransactional(Connection connection) {
-    final List<String> nonTransactional = parser.getNonTransactional();
+    final List<String> nonTransactional = parser.nonTransactional();
     return !nonTransactional.isEmpty() ? runNonTransactional(connection, nonTransactional) : 0;
   }
 
