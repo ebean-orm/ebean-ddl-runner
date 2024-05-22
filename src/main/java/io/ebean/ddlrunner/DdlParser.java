@@ -182,7 +182,7 @@ public final class DdlParser {
      */
     private void endOfContent() {
       String remaining = sb.toString().trim();
-      if (remaining.length() > 0) {
+      if (!remaining.isEmpty()) {
         push(remaining);
         newBuffer();
       }

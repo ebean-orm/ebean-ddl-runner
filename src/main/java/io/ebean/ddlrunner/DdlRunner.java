@@ -10,6 +10,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+
 /**
  * Runs DDL scripts.
  */
@@ -39,10 +42,10 @@ public final class DdlRunner {
   /**
    * Create specifying the auto commit behaviour (for the database platform).
    */
-  public DdlRunner(boolean useAutoCommit, String scriptName, DdlDetect ddlAutoCommit) {
+  public DdlRunner(boolean useAutoCommit, String scriptName, DdlDetect ddlDetect) {
     this.useAutoCommit = useAutoCommit;
     this.scriptName = scriptName;
-    this.parser = new DdlParser(this.useAutoCommit ? DdlDetect.NONE : ddlAutoCommit);
+    this.parser = new DdlParser(this.useAutoCommit ? DdlDetect.NONE : ddlDetect);
   }
 
   /**
@@ -65,7 +68,7 @@ public final class DdlRunner {
       connection.setAutoCommit(true);
     }
     try {
-      logger.log(Level.INFO, "Executing {0} - {1} statements, autoCommit:{2}", scriptName, statements.size(), useAutoCommit);
+      logger.log(INFO, "Executing {0} - {1} statements, autoCommit:{2}", scriptName, statements.size(), useAutoCommit);
       for (int x = 0, y = statements.size(); x < y; x++) {
         String xOfy = (x + 1) + " of " + y;
         String ddl = statements.get(x);
@@ -90,18 +93,18 @@ public final class DdlRunner {
       sql = sql.substring(0, sql.length() - 1);
     }
     if (sql.isEmpty()) {
-      logger.log(Level.DEBUG, "skip empty statement at {0}", oneOf);
+      logger.log(DEBUG, "skip empty statement at {0}", oneOf);
       return;
     }
-    if (logger.isLoggable(Level.DEBUG)) {
-      logger.log(Level.DEBUG, "executing {0} {1}", oneOf, summary(sql));
+    if (logger.isLoggable(DEBUG)) {
+      logger.log(DEBUG, "executing {0} {1}", oneOf, summary(sql));
     }
 
     try (Statement statement = c.createStatement()) {
       statement.execute(sql);
     } catch (SQLException e) {
       if (useAutoCommit) {
-        logger.log(Level.DEBUG, " ... ignoring error executing {0} error: {1}", summary(sql), e.getMessage());
+        logger.log(DEBUG, " ... ignoring error executing {0} error: {1}", summary(sql), e.getMessage());
       } else {
         throw new SQLException("Error executing [" + sql + "] error[" + e.getMessage() + "]", e);
       }
@@ -126,14 +129,15 @@ public final class DdlRunner {
   /**
    * Run the non-transactional statements with auto commit true.
    */
+  @SuppressWarnings("SqlSourceToSinkFlow")
   public int runNonTransactional(Connection connection, List<String> nonTransactional) {
     int count = 0;
     try {
-      logger.log(Level.DEBUG, "running {0} non-transactional migration statements", nonTransactional.size());
+      logger.log(DEBUG, "running {0} non-transactional migration statements", nonTransactional.size());
       connection.setAutoCommit(true);
       for (String sql : nonTransactional) {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-          logger.log(Level.DEBUG, "executing - {0}", sql);
+          logger.log(DEBUG, "executing - {0}", sql);
           statement.execute();
           count++;
         } catch (SQLException e) {
